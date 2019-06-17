@@ -3,106 +3,65 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 
 
+
 String id;
 final db = Firestore.instance;
 final _formKey = GlobalKey<FormState>();
 String name;
+final textController1 = TextEditingController();
+int counter = 0;
+
 
 class Create extends StatefulWidget {
   @override
   _CreateState createState() => _CreateState();
+
 }
 
 class _CreateState extends State<Create> {
+  void onPressed() {
+    setState(() {
+      counter++;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: AppBar(title: Text("Create"),),
-      body: ListView(
-        padding: EdgeInsets.all(8),
-        children: <Widget>[
-          Form(
-            key: _formKey,
-            child: buildTextFormField(),
+        appBar: AppBar(title: Text("Create"),),
+        body: LayoutBuilder(
+            builder: (context,size){
+              TextSpan text = new TextSpan(
+                text: "Hi",
+                style: new TextStyle(
+                  fontSize: 25.0,
+                  color: Colors.green,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+              TextPainter tp = new TextPainter(
+                text: text,
+                textDirection: TextDirection.ltr,
+                textAlign: TextAlign.left,
+              );
+              tp.layout(maxWidth: size.maxWidth);
+
+              int lines = (tp.size.height / tp.preferredLineHeight).ceil();
+              int maxLines = 10;
 
 
-          ),
-          Row(
-            children: <Widget>[
-              FlatButton(
-                onPressed: () => updateData(doc),
-                child: Text("Update todo", style: TextStyle(color: Colors.white),),
-                color: Colors.green,
-              ),
-              SizedBox(width: 8,),
-              FlatButton(
-                onPressed: () => deleteData(doc),
-                child: Text('Delete'),
-              ),
-            ],
-          )
-        ],
-      ),
+              return TextField(
+                controller: textController1,
+                maxLines: lines < maxLines ? null : maxLines,
+                style: new TextStyle(
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.w600,
+                ),
+              );
+
+            }
+        )
+
     );
-  }
-
-  TextFormField buildTextFormField() {
-    return TextFormField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: 'name',
-        fillColor: Colors.grey[300],
-        filled: true,
-      ),
-      validator: (value) {
-        if(value.isEmpty) {
-          return "Pleaase enter text";
-        }
-      },
-      onSaved: (value) => name = value,
-    );
-  }
-
-  void createData() async {
-    if (_formKey.currentState.validate()) {
-      _formKey.currentState.save();
-      DocumentReference ref = await db.collection('CRUD').add({'name': '$name 😎', 'todo': randomTodo()});
-      setState(() => id = ref.documentID);
-      print(ref.documentID);
-    }
-  }
-
-  void readData() async {
-    DocumentSnapshot snapshot = await db.collection('CRUD').document(id).get();
-    print(snapshot.data['name']);
-  }
-
-  void updateData(DocumentSnapshot doc) async {
-    await db.collection('CRUD').document(doc.documentID).updateData({'todo': 'please 🤫'});
-  }
-
-  void deleteData(DocumentSnapshot doc) async {
-    await db.collection('CRUD').document(doc.documentID).delete();
-    setState(() => id = null);
-  }
-
-  String randomTodo() {
-    final randomNumber = Random().nextInt(4);
-    String todo;
-    switch (randomNumber) {
-      case 1:
-        todo = 'Like and subscribe 💩';
-        break;
-      case 2:
-        todo = 'Twitter @robertbrunhage 🤣';
-        break;
-      case 3:
-        todo = 'Patreon in the description 🤗';
-        break;
-      default:
-        todo = 'Leave a comment 🤓';
-        break;
-    }
-    return todo;
   }
 }
