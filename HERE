@@ -108,3 +108,8 @@ class _LoginPageState extends State<LoginPage> {
 
 }
 
+
+assets:
+    - assets/upseal2.png
+    - assets/upcebu.jpg
+    - assets/upcebu.png
